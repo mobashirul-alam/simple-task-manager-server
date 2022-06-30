@@ -15,7 +15,21 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect();
-        console.log('database connected')
+
+        const tasksDatabase = client.db('simple_task_manager').collection('tasks');
+
+        app.get('/tasks', async (req, res) => {
+            const query = {};
+            const cursor = tasksDatabase.find(query);
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        app.post('/tasks', async (req, res) => {
+            const data = req.body;
+            const result = await tasksDatabase.insertOne(data);
+            res.send(result);
+        });
     }
     finally {
 
