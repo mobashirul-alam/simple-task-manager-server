@@ -2,7 +2,7 @@ const express = require('express')
 const cors = require('cors');
 const app = express();
 require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const port = process.env.PORT || 5000;
 
 app.use(cors());
@@ -17,9 +17,10 @@ async function run() {
         await client.connect();
 
         const tasksDatabase = client.db('simple_task_manager').collection('tasks');
+        // const completedTasksDatabase = client.db('simple_task_manager').collection('completedTasks');
 
         app.get('/tasks', async (req, res) => {
-            const query = {};
+            const query = { state: undefined };
             const cursor = tasksDatabase.find(query);
             const result = await cursor.toArray();
             res.send(result);
@@ -28,6 +29,29 @@ async function run() {
         app.post('/tasks', async (req, res) => {
             const data = req.body;
             const result = await tasksDatabase.insertOne(data);
+            res.send(result);
+        });
+
+        app.put('/tasks/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+            const data = req.body;
+            console.log(data)
+            const options = { upsert: true };
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    state: data.state
+                },
+            };
+            const result = await tasksDatabase.updateOne(filter, updateDoc, options);
+            res.send(result);
+        });
+
+        app.get('/completedTasks', async (req, res) => {
+            const query = { state: "completed" };
+            const cursor = tasksDatabase.find(query);
+            const result = await cursor.toArray();
             res.send(result);
         });
     }
