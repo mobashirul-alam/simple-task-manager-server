@@ -33,9 +33,7 @@ async function run() {
 
         app.put('/tasks/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id)
             const data = req.body;
-            console.log(data)
             const options = { upsert: true };
             const filter = { _id: ObjectId(id) };
             const updateDoc = {
@@ -49,9 +47,7 @@ async function run() {
 
         app.put('/editedTasks/:id', async (req, res) => {
             const id = req.params.id;
-            console.log(id)
             const data = req.body;
-            console.log(data)
             const options = { upsert: true };
             const filter = { _id: ObjectId(id) };
             const updateDoc = {
@@ -72,15 +68,15 @@ async function run() {
     }
     finally {
 
-    }
-}
+    };
+};
 
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
     res.send('Hello from Simple Task Manager')
-})
+});
 
 app.listen(port, () => {
     console.log(`Task manager app listening on port ${port}`)
-})
+});
