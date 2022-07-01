@@ -17,7 +17,6 @@ async function run() {
         await client.connect();
 
         const tasksDatabase = client.db('simple_task_manager').collection('tasks');
-        // const completedTasksDatabase = client.db('simple_task_manager').collection('completedTasks');
 
         app.get('/tasks', async (req, res) => {
             const query = { state: undefined };
@@ -42,6 +41,22 @@ async function run() {
             const updateDoc = {
                 $set: {
                     state: data.state
+                },
+            };
+            const result = await tasksDatabase.updateOne(filter, updateDoc, options);
+            res.send(result);
+        });
+
+        app.put('/editedTasks/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+            const data = req.body;
+            console.log(data)
+            const options = { upsert: true };
+            const filter = { _id: ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    task: data.task
                 },
             };
             const result = await tasksDatabase.updateOne(filter, updateDoc, options);
